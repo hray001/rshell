@@ -22,7 +22,7 @@ int main(){
     char *token, *cmd;
     char tk[] = " ";
     int argc = -1;
-
+    char semicolon = ';';
     getline(cin, input);
 
     if(input == "exit"){
@@ -38,12 +38,19 @@ int main(){
             str[i] = input[i];
         }
     str[i] = '\0';
+
+
+//---------------work in progress-------------------------------------
+    
+
+
+//--------------------------------------------------------------------
     token = strtok(str, tk);
     cmd = token;
     argv[++argc] = token;
 
     while(token != NULL){
-        //cout << token << endl;
+        cout << token << endl;
         token = strtok(NULL,tk);
         argv[++argc] = token;
     }
