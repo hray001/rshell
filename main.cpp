@@ -7,15 +7,26 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
+#include <vector>
 
 using namespace std;
 
 int main(){
 
+    string user = getlogin();
+    if(user == " "){
+        perror("getlogin() failed to attain username");
+        user = "usererror";
+    }
+    char host[1024];
+    int len = 1024;
+    int hosterror = gethostname(host, len);
+    if(hosterror == -1){
+        perror("gethostname() failed to attain host name");
+    }
     while(1){
    
-    cout << "$ ";
+    cout << user << "@" << host << "$ ";
     string input;
     char *argv[128];
     char *token, *cmd;
@@ -44,7 +55,8 @@ int main(){
 
 
 //---------------work in progress-------------------------------------
-    char *connectorarr[128]; //= new char[semicount];
+    vector <char *> connectorarr; 
+    connectorarr.resize(128);
     char *arr = new char[semicount]; 
     arr = strtok(str, semicolon);
     connectorarr[++argc] = arr;
