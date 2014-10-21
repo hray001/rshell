@@ -36,9 +36,9 @@ int main(){
     char semicolon[] = ";";
     getline(cin, input);
 
-    if(input == "exit"){
-        exit(1);
-    }
+   // if(input == "exit"){
+   //     exit(1);
+   // }
 
     char *str = new char[input.size()+1];
     unsigned i; 
@@ -52,9 +52,20 @@ int main(){
             str[i] = input[i];
         }
     str[i] = '\0';
-
-
-//---------------work in progress-------------------------------------
+    string end = "exit";
+    int endcount = 0;
+    for(unsigned i = 0; i < 5; i++){
+        if(str[i] != end[i]){
+            break;
+        }
+        else{
+            endcount++;
+        }
+    }
+    if(endcount >= 4){
+        exit(1);
+    }
+//-------------------------split tokens by ';'-------------------------------
     vector <char *> connectorarr; 
     connectorarr.resize(128);
     char *arr = new char[semicount]; 
@@ -72,9 +83,10 @@ cout << connectorarr[j]<< " " << argc << " "<< j << endl;
 */
 
 
-//--------------------------------------------------------------------
+//---------------------------------------------------------------------------
 unsigned iterations = argc;
         for(unsigned j = 0; j < iterations ; j++){
+
         argc = -1;
         token = strtok(connectorarr[j], tk);
         cmd = token;

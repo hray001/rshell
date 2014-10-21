@@ -58,15 +58,19 @@ BUGS
 Commenting code too simplistic. Basic commenting will work but trickier caes will not run as intended. EX:
 
 BASH 
--
+------
 `touch hello#world`
  would create a file called `hello#world`
 
 RSHELL
--
+------
 `touch hello#world`
  would create a file called `hello` while world would be considered part of a comment
 
 Connectors
---
+------
 The connect `;` works as intended but `&&` and `||` have not been completed and will not provide any use
+
+exit
+------
+`exit` does not work on a line with multiple commands. `exit` will work but `pwd;exit` would not
