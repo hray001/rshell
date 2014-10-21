@@ -17,12 +17,12 @@ int main(){
    
     cout << "$ ";
     string input;
-    //char *str;
     char *argv[128];
     char *token, *cmd;
     char tk[] = " ";
-    int argc = -1;
-    char semicolon = ';';
+    int argc = -1, semicount = 0;
+    
+    char semicolon[] = ";";
     getline(cin, input);
 
     if(input == "exit"){
@@ -35,43 +35,63 @@ int main(){
             if(input[i] == '#'){
                 break;
             }
+            if(input[i] == semicolon[0]){
+                semicount++;
+            }
             str[i] = input[i];
         }
     str[i] = '\0';
 
 
 //---------------work in progress-------------------------------------
-    
+    char *connectorarr[128]; //= new char[semicount];
+    char *arr = new char[semicount]; 
+    arr = strtok(str, semicolon);
+    connectorarr[++argc] = arr;
+    while(arr != NULL){
+        //cout << arr << endl;
+        arr = strtok(NULL, semicolon);
+        connectorarr[++argc] = arr;
+    }
+    connectorarr[++argc] = '\0';
+/*for(int j = 0; j< argc - 1;j++){
+cout << connectorarr[j]<< " " << argc << " "<< j << endl;
+}
+*/
 
 
 //--------------------------------------------------------------------
-    token = strtok(str, tk);
-    cmd = token;
-    argv[++argc] = token;
-
-    while(token != NULL){
-        cout << token << endl;
-        token = strtok(NULL,tk);
+unsigned iterations = argc;
+        for(unsigned j = 0; j < iterations ; j++){
+        argc = -1;
+        token = strtok(connectorarr[j], tk);
+        cmd = token;
         argv[++argc] = token;
-    }
-    argv[++argc] = '\0';
 
-    int pid = fork();
-        if(pid == -1){
-            perror("fork failed");
-        }
-        else if(pid == 0){
-    //child 
-            if(-1 == execvp(cmd,argv ) ){
-                perror("execvp error");
+            while(token != NULL){
+            // cout << token << endl;
+                token = strtok(NULL,tk);
+                argv[++argc] = token;
             }
-            exit(1);
-        }
-        else{
-            if(wait(0) == -1){
-                perror("wait() error");
+        argv[++argc] = '\0';
+
+        int pid = fork();
+            if(pid == -1){
+                perror("fork failed");
             }
-        }   
+            else if(pid == 0){
+            //child 
+                if(-1 == execvp(cmd,argv ) ){
+                    perror("execvp error");
+                }
+                exit(1);
+            }
+            else{
+                if(wait(0) == -1){
+                    perror("wait() error");
+                }
+            }      
+        }
     }
         return 0;
     
