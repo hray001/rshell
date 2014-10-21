@@ -32,6 +32,9 @@ int main(){
     char *str = new char[input.size()+1];
     unsigned i; 
         for(i = 0; i < input.length(); i++){
+            if(input[i] == '#'){
+                break;
+            }
             str[i] = input[i];
         }
     str[i] = '\0';
