@@ -84,16 +84,32 @@ cout << connectorarr[j]<< " " << argc << " "<< j << endl;
 
 
 //---------------------------------------------------------------------------
-unsigned iterations = argc;
-        for(unsigned j = 0; j < iterations ; j++){
-
+unsigned iterations = argc; //Number of commands separated by ';'
+        for(unsigned j = 0; j < iterations-1 ; j++){
+            char andchar[] = "&|";
+            vector <char *> andarr;
+            andarr.resize(128);
+            char *andarr2 = new char[128];
+            andarr2 = strtok(connectorarr[j], andchar);
+            andarr[0] = andarr2;
+            unsigned cand = 0;
+            while(andarr2 != NULL){
+                //cout << "andarr2 " << andarr2 << endl;
+                andarr2 = strtok(NULL, andchar);
+                andarr[++cand] = andarr2;
+            }
+unsigned it = 0;
+for(; it <= cand; ++it){
+//cout << "iterations: " << it << endl;
+//-----------------------space token and system calls-----------------------
+        //cout << "cand " << cand << endl;
         argc = -1;
-        token = strtok(connectorarr[j], tk);
+        token = strtok(andarr[it], tk);
         cmd = token;
         argv[++argc] = token;
 
             while(token != NULL){
-            // cout << token << endl;
+//             cout << token << endl;
                 token = strtok(NULL,tk);
                 argv[++argc] = token;
             }
@@ -101,20 +117,22 @@ unsigned iterations = argc;
 
         int pid = fork();
             if(pid == -1){
-                perror("fork failed");
+                perror("fork");
             }
             else if(pid == 0){
             //child 
                 if(-1 == execvp(cmd,argv ) ){
-                    perror("execvp error");
+                    perror("execvp");
                 }
                 exit(1);
             }
             else{
                 if(wait(0) == -1){
-                    perror("wait() error");
+                    perror("wait()");
                 }
             }      
+}
+//---------------------------------------------------------------------------
         }
     }
         return 0;
