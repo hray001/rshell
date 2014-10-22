@@ -54,23 +54,28 @@ Purpose of the shell is to work similarly, though more limited, to the BASH shel
 * Cannot run built-in BASH commads (`cd` and the sort)
 
 BUGS
----
+===
+Comment
+------
 Commenting code too simplistic. Basic commenting will work but trickier caes will not run as intended. EX:
 
 BASH 
-------
+
 `touch hello#world`
  would create a file called `hello#world`
 
 RSHELL
-------
+
 `touch hello#world`
  would create a file called `hello` while world would be considered part of a comment
 
 Connectors
 ------
-The connect `;` works as intended but `&&` and `||` have not been completed and will not provide any use
+The connect `;` works as intended but `&&` and `||` simply execute the commands following them the same way `;` does. 
 
 exit
 ------
 `exit` does not work on a line with multiple commands. `exit` will work but `pwd;exit` would not
+size
+------
+Does not work for an infinitely large command.
