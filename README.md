@@ -79,3 +79,8 @@ exit
 size
 ------
 Does not work for an infinitely large command.
+
+LS
+`-R` does not work properly and no combination of it and other flags will work properly
+
+specifying no directory argument results in nothing being output.
