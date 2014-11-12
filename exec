@@ -1,0 +1,85 @@
+Script started on Tue 11 Nov 2014 11:37:23 PM PST
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls ~ #checkig[Kng ls on home directory
+coreutils        Desktop          Documents        
+Downloads        Dropbox          examples.desktop 
+Music            myCString.h      myCString.h.gch  
+Pictures         Public           RSA.cpp          rshell           
+rshell-1         Templates        test             test.cpp         
+ucr-cs100        Videos           
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ l[K./ls . #current directory bin
+cp         ls         rshell     typescript 
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls ..
+bin       LICENSE   Makefile  README.md src       tests     
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -a .. #should contain . ..
+.         ..        .git      bin       LICENSE   Makefile  
+README.md src       tests     
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ls -l ..
+total 24
+drwxrwxr-x 2 tarrich tarrich 4096 Nov 11 23:37 [0m[01;34mbin[0m
+-rw-rw-r-- 1 tarrich tarrich   88 Oct 21 21:30 LICENSE
+-rw-rw-r-- 1 tarrich tarrich  293 Nov 11 23:37 Makefile
+-rw-rw-r-- 1 tarrich tarrich 1200 Oct 21 23:14 README.md
+drwxrwxr-x 3 tarrich tarrich 4096 Nov 11 23:36 [01;34msrc[0m
+drwxrwxr-x 2 tarrich tarrich 4096 Oct 21 22:06 [01;34mtests[0m
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ls -la ..
+total 36
+drwxrwxr-x  6 tarrich tarrich 4096 Nov 11 23:37 [0m[01;34m.[0m
+drwxr-xr-x 27 tarrich tarrich 4096 Nov 11 23:37 [01;34m..[0m
+drwxrwxr-x  2 tarrich tarrich 4096 Nov 11 23:37 [01;34mbin[0m
+drwxrwxr-x  8 tarrich tarrich 4096 Nov 11 11:30 [01;34m.git[0m
+-rw-rw-r--  1 tarrich tarrich   88 Oct 21 21:30 LICENSE
+-rw-rw-r--  1 tarrich tarrich  293 Nov 11 23:37 Makefile
+-rw-rw-r--  1 tarrich tarrich 1200 Oct 21 23:14 README.md
+drwxrwxr-x  3 tarrich tarrich 4096 Nov 11 23:36 [01;34msrc[0m
+drwxrwxr-x  2 tarrich tarrich 4096 Oct 21 22:06 [01;34mtests[0m
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ls -R #-R has many problems, won't do[K[Kwork except for  simple cases
+.:
+[0m[01;32mcp[0m  [01;32mls[0m  [01;32mrshell[0m  typescript
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ls -R [K[K[K[K[K[K./ls -R
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -R ..
+..:
+bin       LICENSE   Makefile  README.md src       tests     
+bin:
+tests:
+src:
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -R ..[K[K~
+/home/tarrich:
+coreutils        Desktop          Documents        
+Downloads        Dropbox          examples.desktop 
+Music            myCString.h      myCString.h.gch  
+Pictures         Public           RSA.cpp          rshell           
+rshell-1         Templates        test             test.cpp         
+ucr-cs100        Videos           
+Templates:
+Downloads:
+Videos:
+Public:
+Dropbox:
+ucr-cs100:
+rshell-1:
+Documents:
+Music:
+Desktop:
+coreutils:
+rshell:
+Pictures:
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -al #showing order doesnt matter
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -al #showing order doesnt matter[1@.[1@ 
+-rw-rw-r-- 1 tarrich tarrich 0  typescript
+-rwxrwxr-x 1 tarrich tarrich 61217  ls
+-rwxrwxr-x 1 tarrich tarrich 19813  cp
+drwxrwxr-x 6 tarrich tarrich 4096  ..
+drwxrwxr-x 2 tarrich tarrich 4096  .
+-rwxrwxr-x 1 tarrich tarrich 28457  rshell
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ls[K[K./ls -a
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls -a .
+.          ..         cp         ls         rshell     typescript 
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ #withour[Kt putting an [K argument nothing shows up. did  not take into account when argv would have no directory
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./ls .
+cp         ls         rshell     typescript 
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ ./c[Klas[K[Ks . -a #showing order of flag placement desnt [K[K[K[K[Koesnt  matter
+.          ..         cp         ls         rshell     typescript 
+]0;tarrich@Tarrich: ~/rshell/bintarrich@Tarrich:~/rshell/bin$ exit
+exit
+
+Script done on Tue 11 Nov 2014 11:41:43 PM PST

@@ -1,11 +1,14 @@
 opt = -Wall -Werror -ansi -pedantic
-all: cp rshell clean 
-	mkdir ~/rshell/bin    
+all: cp rshell ls clean 
+	mkdir ./bin    
 	mv rshell bin
 	mv cp bin
+	mv ls bin
 cp: ./src/cp.cpp
 	g++ $(opt) ./src/cp.cpp -o cp
-rshell: ~/rshell/src/main.cpp
-	g++ $(opt) ~/rshell/src/main.cpp -o rshell
+ls: ./src/ls.cpp
+	g++ $(opt) ./src/ls.cpp -o ls
+rshell: ./src/main.cpp
+	g++ $(opt) ./src/main.cpp -o rshell
 clean: 
-	rm -rf ~/rshell/bin
+	rm -rf ./bin
