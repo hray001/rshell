@@ -85,3 +85,5 @@ LS
 `-R` does not work properly and no combination of it and other flags will work properly. Works only on current directory with the recursive directories containing other folders. Empty folders cause seg faults.
 
 specifying no directory argument results in nothing being output.
+
+`-l` does not format all nice and pretty when the sizes of the files are different.
