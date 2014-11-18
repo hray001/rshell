@@ -28,7 +28,7 @@ int main(){
    
     cout << user << "@" << host << "$ ";
     string input;
-    char *argv[128];
+    char *argv[BUFSIZ];
     char *token, *cmd;
     char tk[] = " ";
     int argc = -1, semicount = 0;
@@ -102,6 +102,7 @@ unsigned it = 0;
 for(; it <= cand; ++it){
 //cout << "iterations: " << it << endl;
 //-----------------------space token and system calls-----------------------
+        //Comment out && and || stuff to work on piping
         //cout << "cand " << cand << endl;
         argc = -1;
         token = strtok(andarr[it], tk);
