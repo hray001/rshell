@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <vector>
 
 using namespace std;
@@ -89,7 +92,7 @@ unsigned iterations = argc; //Number of commands separated by ';'
             char andchar[] = "&|";
             vector <char *> andarr;
             andarr.resize(128);
-            char *andarr2 = new char[128];
+            char *andarr2 = new char[4096];
             andarr2 = strtok(connectorarr[j], andchar);
             andarr[0] = andarr2;
             unsigned cand = 0;
@@ -98,12 +101,149 @@ unsigned iterations = argc; //Number of commands separated by ';'
                 andarr2 = strtok(NULL, andchar);
                 andarr[++cand] = andarr2;
             }
+            delete andarr2;
 unsigned it = 0;
+int fd = 0;
+int save;
+bool redirection = false;
 for(; it <= cand; ++it){
 //cout << "iterations: " << it << endl;
 //-----------------------space token and system calls-----------------------
-        //Comment out && and || stuff to work on piping
-        //cout << "cand " << cand << endl;
+       //Comment out && and || stuff to work on piping
+       //cout << "cand " << cand << endl;
+        argc = -1;
+        token = strtok(andarr[it], tk);
+        cmd = token;
+        argv[++argc] = token;
+            while(token != NULL){
+//             cout << token << endl;
+                token = strtok(NULL,tk);
+                argv[++argc] = token;
+            }
+        argv[++argc] = '\0';
+//       int repos = 0;
+        unsigned x = 0;
+        unsigned last_redir = 0;
+       for(x = 0; argv[x] != '\0'; ++x){
+            if(strcmp(argv[x], "<") == 0){
+                redirection = true;     
+                fd = open(argv[x+1], O_RDONLY);
+                if(fd < 0) perror("open");
+                else{
+                    save = x;
+                    argv[x] = '\0';    
+                    int pid;
+                    if( (pid = fork()) < 0) perror("fork");
+                    else if(pid == 0){
+                        //cerr << "inside child" << endl;
+                        if(dup2(fd, 0) == -1) perror("dup2");
+                        //if(close(fd) == -1) perror("close");
+                        //cout << argv[x] << endl;
+                        if(execvp(argv[last_redir], argv) == -1)
+                            perror("execvp");
+                    }
+                    else{
+                        if(wait(0) == -1) perror("wait");
+                        if(close(fd) == -1) perror("close");
+                        char a[1] = {'<'};
+                        argv[save] = a;
+                        last_redir = x;
+                    }
+                }
+            }
+            else if(strcmp(argv[x], ">") == 0){
+                cout <<endl <<  "test" << endl;
+                redirection = true;
+                fd = open(argv[x+1], O_RDWR | O_CREAT | O_TRUNC);
+                if(fd < 0) perror("open");
+                else{
+                    save = x;
+                    argv[x] = '\0';
+                    int pid;
+                    if( (pid = fork()) == -1) perror("fork");
+                    else if(pid == 0){
+                        cout << "last_redir" << last_redir << endl;
+                        if(dup2(fd, 1) == -1) perror("dup2");
+                        if(execvp(argv[last_redir], argv) == -1)
+                            perror("execvp");
+                            exit(1);
+                    }else{
+                        if(wait(0) == -1) perror("wait");
+                        cout << "executed" << endl;
+                        if(close(fd) == -1) perror("close");
+                        char a[1] = {'>'};
+                        argv[save] = a;
+                        last_redir = x;    
+                    }
+                }
+            }
+            else if(strcmp(argv[x], ">>") == 0){
+                redirection = true;
+                fd = open(argv[x+1], O_RDWR | O_CREAT | O_APPEND);
+                if(fd < 0) perror("open");
+                else{
+                    save = x;
+                    argv[x] = '\0';
+                    int pid;
+                    if( (pid = fork()) == -1) perror("fork");
+                    else if(pid == 0){
+                        if(dup2(fd, 1) == -1) perror("dup2");
+                        if(execvp(argv[last_redir], argv) == -1)
+                            perror("execvp");
+                            exit(0);
+                    }else{
+                        if(wait(0) == -1) perror("wait");
+                        if(close(fd) == -1) perror("close");
+                        char a[1] = {'>'};
+                        argv[save] = a;
+                        last_redir = x;    
+                    }
+                }
+            }
+            else if(strcmp(argv[x], "|") == 0){
+                int fds[2];
+                int pid;
+                char buf;
+                save = x;
+                argv[x] = '\0';
+                if(pipe(fds) == -1) perror("pipe");
+                if((pid = fork()) == -1) perror("fork");
+                else if(pid == 0){
+                    if( (fd = open(argv[x+1], O_RDWR | O_CREAT)) == -1)
+                        perror("open");
+                    if(dup2(fds[0], 0) == -1) perror("dup2");
+                    if(close(fds[1]) == -1) perror("close");
+                    while( read(0, &buf, 1) > 0){
+                        if(write(fd, &i, 1) == -1) perror("write");
+                    }
+                    exit(0);
+                        
+                }
+                if((pid = fork()) == -1) perror("fork");
+                else if(pid == 0){
+                    if(dup2(fds[1], 1) == -1) perror("dup2");
+                    if(close(fds[0]) == -1) perror("close");
+                    if(execvp(argv[last_redir], argv) == -1)
+                        perror("execvp");
+                    exit(0);
+                }
+                else if(pid > 0){
+                    if(wait(0) == -1) perror("wait");
+                   // if(close(fds[0]) == -1) perror("close");
+                    //if(close(fds[1]) == -1) perror("close");
+                    char a[1] = {'|'};
+                    argv[save] = a;
+                    last_redir = x;
+                    cout << "reached" << endl;
+                }
+            }
+       }
+       if(redirection){
+                
+       } 
+        
+        
+       else{
         argc = -1;
         token = strtok(andarr[it], tk);
         cmd = token;
@@ -115,7 +255,6 @@ for(; it <= cand; ++it){
                 argv[++argc] = token;
             }
         argv[++argc] = '\0';
-
         int pid = fork();
             if(pid == -1){
                 perror("fork");
@@ -131,7 +270,8 @@ for(; it <= cand; ++it){
                 if(wait(0) == -1){
                     perror("wait()");
                 }
-            }      
+            }
+       }
 }
 //---------------------------------------------------------------------------
         }
