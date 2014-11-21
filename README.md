@@ -87,3 +87,12 @@ LS
 specifying no directory argument results in nothing being output.
 
 `-l` does not format all nice and pretty when the sizes of the files are different.
+
+IO Redirection
+--------------
+`>` and `<` work under the constraint that there are spaces surrounding them. There was a situation where combining input and output redirection resulted in the username and group ID being output infinitely but I have not been able to reproduce those results and have not found the cause.
+ 
+`2>` and `3>` and their `>>` equivolents work under the constraint that the fd exists.
+
+`|`: all forms of piping are problematic, will not work.
+
