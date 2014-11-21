@@ -59,42 +59,13 @@ void ls_noflag(dirent *direntp, vector<string> &v){
         v.push_back(a);
     }
 }
-/*
-void R (char *R_arg){
-    int numarg = 0;
-    int curchar = 0;
-    DIR *dirp;
-    if ( (dirp = opendir(R_arg))  == NULL){
-        perror("opendir");
-        exit(1);
-    }
-    cout << "open succeeded" << endl;
-    dirent *direntp;
-    vector< string > v;
-    while ((direntp = readdir(dirp)) != NULL){
-        char buf[BUFSIZ];
-        unsigned bufsize = 0;
-        while(R_arg[curchar] != '\0'){
-            buf[bufsize] = R_arg[bufsize];
-            buffsize++;
-        }
-        buf[bufsize] = '/';
-        ++bufsize;
-        unsigned k = 0;
-        while(direntp->d_name[k] != '\0'){
-            buf[bufsize] = direntp->d_name[k];
-            ++bufsize;
-            ++k;
-        }
-    }
-}*/
 void ls_R( char *r_arg){
     if(!flag_a){
     vector<string> v;
     char R_arg[4096][256];
     unsigned int numdirs = 0;
-    if(opendir(r_arg)==NULL){ return;} 
-    DIR  *dirp = opendir(r_arg);
+    DIR  *dirp;
+    if( ( dirp = opendir(r_arg)) == NULL){perror("opendir"); return;} 
     dirent *direntp;
     while((direntp = readdir(dirp)) != NULL){
        if(direntp->d_name[0] != '.'){
@@ -126,6 +97,7 @@ void ls_R( char *r_arg){
         }
        }
     }
+    if(direntp == NULL) perror("readdir");
     output_sorted(v);
     if(flag_a){
         cout << endl << ".:"<< endl;
@@ -186,12 +158,11 @@ int main(int argc, char** argv)
     string dot = ".";
     dirName = strcpy(dirName, dot. c_str() );
     DIR *dirp;
-    if ( opendir(argv[arg[i]])  == NULL){
+    if ( (dirp = opendir(argv[arg[i]]))  == NULL){
         perror("opendir");
         exit(1);
     }
     //cout << "open succeeded" << endl;
-    dirp = opendir(argv[arg[i]]);
     dirent *direntp;
     vector< string > v;
     while ((direntp = readdir(dirp)) != NULL){
@@ -389,6 +360,6 @@ int main(int argc, char** argv)
         }
         */
     }
-        closedir(dirp);
+       if( closedir(dirp) == -1) perror("closedir");
     }
 }
