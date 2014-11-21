@@ -261,53 +261,40 @@ for(; it <= cand; ++it){
                 }
             }
             else if(strcmp(argv[x], "|") == 0){
-                cerr << "got here" << endl;
                 int fds[2];
                 int pid;
                 char buf;
                 save = x;
                 argv[x] = '\0';
                 if(pipe(fds) == -1) perror("pipe");
-                cerr << "pipe" << endl;
-                if( (fd = open(argv[x+1], O_RDWR | O_CREAT)) == -1)
-                        perror("open");
+
+                //if( (fd = open(argv[x+1], O_RDWR | O_CREAT)) == -1)
+                //        perror("open");
                 if((pid = fork()) == -1) perror("fork");
-                else if(pid == 0){
-                    cerr << "start of first file" << endl;
-                    //if( (fd = open(argv[x+1], O_RDWR | O_CREAT)) == -1)
-                       // perror("open");
-                    if(dup2(fds[0], 0) == -1) perror("dup2");
-                    //if(close(fds[0]) == -1) perror("close");
-                    if(close(fds[1]) == -1) perror("close");
-                    int read_check;
-                    while( (read_check = read(0, &buf, 1)) > 0){
-                        if(write(fd, &i, 1) == -1) perror("write");
+                if(pid == 0){
+                    if( close(fds[1]) == -1) perror("close");
+                    int readfd;
+                    while( (readfd = read(fds[0], &buf, 1)) >0){
+                        if(readfd == -1) perror("read");
+                        if(write(STDOUT_FILENO, &buf, 1) == -1)
+                            perror("write");
                     }
-                    if(read_check == -1) perror("read");
-                    cerr << "end of first child" << endl;
-                    exit(0);
-                        
-                }
-                if((pid = fork()) == -1) perror("fork");
-                else if(pid == 0){
-                    cerr << "second child" << endl;
-                    if(dup2(fds[1], 1) == -1) perror("dup2");
-                    //if(close(fds[1]) == -1) perror("close");
+                    if(write(STDOUT_FILENO, "\n", 1) == -1) perror("write");
                     if(close(fds[0]) == -1) perror("close");
-                    if(execvp(argv[x+1], argv) == -1)
-                        perror("execvp");
                     exit(0);
+                    //if(execvp(argv[last_redir], argv) == -1)
+                    //     perror("execvp");
                 }
-                else if(pid > 0){
-                    if(wait(0) == -1) perror("wait");
-                    if(wait(0) == -1) perror("wait");
+                else{
                     if(close(fds[0]) == -1) perror("close");
+                    if(write(fds[1], argv[x+1], BUFSIZ)== -1) perror("write");
                     if(close(fds[1]) == -1) perror("close");
+                    if(wait(0) == -1) perror("wait");
                     char a[1] = {'|'};
                     argv[save] = a;
                     last_redir = x;
-                    cout << "reached" << endl;
                 }
+                
             }
        }
        if(redirection){
