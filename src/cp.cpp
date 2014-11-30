@@ -126,48 +126,40 @@ int main(int argc, char** argv)
         double wall2, user2, system2;
         t.start();
 
-        int file1 = open(arg_1, O_RDONLY);
+        int file1;
+        if((file1 = open(arg_1, O_RDONLY)) == -1)perror("open");
         
         int file2 = 0;
-        if(file1 == -1)
-        {
-            perror("open");
-        }
         if(print_time)
         {
-            file2 = open(arg_2, O_WRONLY | O_CREAT);
+           if( (file2 = open(arg_2, O_WRONLY | O_CREAT)) == -1)perror("open");
         }    
         else
         {
-            file2 = open(arg_2, O_WRONLY | O_CREAT | O_EXCL);
+            if((file2 = open(arg_2, O_WRONLY | O_CREAT | O_EXCL)) == -1){
+                 perror("open");
+                 exit(1);
+            }
         }
 
-        if(file2 == -1)
-        {
-            perror("open");
-            exit(1);
-        }
-        else
-        {
+        
             char buffer[1];
 
             int bytes = read(file1, buffer, 1);
+            if(bytes == -1) perror("read");
             while(bytes > 0)
             {
                 if(write(file2, buffer, 1) == -1)
                     perror("write");
-                bytes = read(file1, buffer, 1);
+                if((bytes = read(file1, buffer, 1)) == -1)perror("read");
             }
 
-            if(bytes == -1)
-                perror("read");
-        }
-        int close1 = close(file1);
-        if(close1 == -1)
+        int close1;
+        if((close1 = close(file1)) == -1)
             perror("close");
 
-        int close2 = close(file2);
-        if(close2 == -1)
+        int close2;
+        if((close2 = close(file2)) == -1)
             perror("close");
 
         t.elapsedWallclockTime(wall2);
@@ -186,8 +178,8 @@ int main(int argc, char** argv)
     t.start();
 
     char buffer2[BUFSIZ];
-    int file_a = open(arg_1, O_RDONLY);
-    if(file_a == -1)
+    int file_a;
+    if((file_a = open(arg_1, O_RDONLY)) == -1)
     {
         perror("open");
     }
@@ -195,30 +187,28 @@ int main(int argc, char** argv)
     int file_b = 0;
     if(print_time)
     {
-        file_b = open(arg_2, O_WRONLY | O_CREAT);
+        if((file_b = open(arg_2, O_WRONLY | O_CREAT)) == -1) 
+            perror("open");
     }    
     else
     {
-        file_b = open(arg_2, O_WRONLY | O_CREAT | O_EXCL);
+        if((file_b = open(arg_2, O_WRONLY | O_CREAT | O_EXCL) == -1)){
+            perror("open");
+            exit(1);
+        }
     }
-    if(file_b == -1)
-    {
-        perror("open");
-        exit(1);
-    }
-
-    int buf = read(file_a, buffer2, BUFSIZ);
-    if(buf == -1)
-        perror("read");
+    int buf;
+    if((buf = read(file_a, buffer2, BUFSIZ)) == -1)
+        perror("read");;
     if(write(file_b, buffer2, buf) == -1)
         perror("write");
     
-    int close_a = close(file_a);
-    if(close_a == -1)
+    int close_a;
+    if((close_a = close(file_a)) == -1)
         perror("close");
 
-    int close_b = close(file_b);
-    if(close_b == -1)
+    int close_b;
+    if((close_b= close(file_b)) == -1)
         perror("close");
 
     if(print_time)
