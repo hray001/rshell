@@ -9,10 +9,12 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <boost/tokenizer.hpp>
 #include <vector>
+#include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 int main(){
 
@@ -39,9 +41,6 @@ int main(){
     char semicolon[] = ";";
     getline(cin, input);
 
-   // if(input == "exit"){
-   //     exit(1);
-   // }
 
     char *str = new char[input.size()+1];
     unsigned i; 
