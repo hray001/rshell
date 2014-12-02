@@ -33,7 +33,7 @@ int main(){
    
     cout << user << "@" << host << "$ ";
     string input;
-    char *argv[BUFSIZ];
+    char **argv;
     char *token, *cmd;
     char tk[] = " ";
     int argc = -1, semicount = 0;
@@ -88,19 +88,16 @@ cout << connectorarr[j]<< " " << argc << " "<< j << endl;
 //---------------------------------------------------------------------------
 unsigned iterations = argc; //Number of commands separated by ';'
         for(unsigned j = 0; j < iterations-1 ; j++){
-            char andchar[] = "&|";
-            vector <char *> andarr;
-            andarr.resize(128);
-            char *andarr2 = new char[4096];
-            andarr2 = strtok(connectorarr[j], andchar);
-            andarr[0] = andarr2;
-            unsigned cand = 0;
-            while(andarr2 != NULL){
-                //cout << "andarr2 " << andarr2 << endl;
-                andarr2 = strtok(NULL, andchar);
-                andarr[++cand] = andarr2;
+            char_separator<char> sep("&|");
+            tokenizor<char_separator<char> > tokens(connectorarr, sep);
+            for(tokenizer<char_separator<char> >::iterator it =
+                 tokens.begin(); 
+                 it != tokens.end();
+                 ++it){
+                cout << *it << endl;
             }
-            delete andarr2;
+
+
 unsigned it = 0;
 int fd = 0;
 int save;
