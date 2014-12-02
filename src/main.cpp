@@ -9,12 +9,49 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <signal.h>
 #include <vector>
+#include <stdlib.h>
 
 using namespace std;
 
+static int pid = -1;
+
+void sig_int_handler(int signum){
+    if(pid == 0){
+    //child
+        if(kill(0, SIGKILL) == -1) perror("kill");
+    }
+    else if(pid > 0){
+    //parent
+    //don't want to interrupt parent
+    }
+    else{
+        //in the case pid is -1 it is handled in the calls to fork() where pid would be set to -1
+    }
+    return;    
+}
+
+void ch_cwdir(char *PATH){
+
+    if( chdir(PATH) == -1) perror("chdir");
+    char *newcwdbuf;
+    cout << getcwd(newcwdbuf, 128) << endl;
+    return;   
+}
+
+void ch_cwdir(){
+    cout << "Error: must specify directory to change to." << endl; 
+    return;    
+}
+
 int main(){
+    signal(SIGINT, sig_int_handler);
+    char **COMMANDS;
+    COMMANDS[0] = "exit";
+    COMMANDS[1] = "cd";
+
+
 
     string user = getlogin();
     if(user == " "){
@@ -29,7 +66,11 @@ int main(){
     }
     while(1){
    
-    cout << user << "@" << host << "$ ";
+    cout << user << "@" << host << ":";
+    //current working directory to be output
+    char *cwdbuf;
+    if(getcwd(cwdbuf, 128) == NULL) perror("getcwd");
+    cout << cwdbuf << "$ ";
     string input;
     char *argv[BUFSIZ];
     char *token, *cmd;
@@ -115,6 +156,7 @@ for(; it <= cand; ++it){
         token = strtok(andarr[it], tk);
         cmd = token;
         argv[++argc] = token;
+        
             while(token != NULL){
 //             cout << token << endl;
                 token = strtok(NULL,tk);
@@ -132,13 +174,23 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';    
-                    int pid;
+                    
                     if( (pid = fork()) < 0) perror("fork");
                     else if(pid == 0){
                         //cerr << "inside child" << endl;
                         if(dup2(fd, 0) == -1) perror("dup2");
                         //if(close(fd) == -1) perror("close");
                         //cout << argv[x] << endl;
+
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
                     }
@@ -156,7 +208,7 @@ for(; it <= cand; ++it){
                 
                 save = x;
                 argv[x] = '\0';
-                int pid;
+                
                 string str;
                 for(int i = 0; argv[x][i] != '\0'; ++i){
                     if(argv[x][i] == '<' || argv[x][i] == '>' 
@@ -172,7 +224,15 @@ for(; it <= cand; ++it){
                         //cerr << "inside child" << endl;
                         if(dup2(fd, 0) == -1) perror("dup2");
                         //if(close(fd) == -1) perror("close");
-                        //cout << argv[x] << endl;
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
                     }
@@ -191,9 +251,18 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';
-                    int pid;
+                    
                     if( (pid = fork()) == -1) perror("fork");
                     else if(pid == 0){
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(dup2(fd, 1) == -1) perror("dup2");
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
@@ -215,10 +284,18 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';
-                    int pid;
                     if( (pid = fork()) == -1) perror("fork");
                     else if(pid == 0){
                         cout << "last_redir" << last_redir << endl;
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(dup2(fd, 1) == -1) perror("dup2");
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
@@ -255,10 +332,18 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';
-                    int pid;
                     if( (pid = fork()) == -1) perror("fork");
                     else if(pid == 0){
                         if(dup2(fd, newfd) == -1) perror("dup2");
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
                             exit(0);
@@ -291,10 +376,18 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';
-                    int pid;
                     if( (pid = fork()) == -1) perror("fork");
                     else if(pid == 0){
                         if(dup2(fd, newfd) == -1) perror("dup2");
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
                             exit(0);
@@ -314,10 +407,18 @@ for(; it <= cand; ++it){
                 else{
                     save = x;
                     argv[x] = '\0';
-                    int pid;
                     if( (pid = fork()) == -1) perror("fork");
                     else if(pid == 0){
                         if(dup2(fd, 1) == -1) perror("dup2");
+                        if( strcmp(argv[last_redir], COMMANDS[0]) == 0) exit(1);
+                        if( strcmp(argv[last_redir], COMMANDS[1]) == 0){
+                            if(argv[last_redir + 1] != '\0'){
+                                ch_cwdir(argv[last_redir + 1]);
+                            }
+                            else{
+                                ch_cwdir();
+                            }
+                        }
                         if(execvp(argv[last_redir], argv) == -1)
                             perror("execvp");
                             exit(0);
@@ -332,7 +433,6 @@ for(; it <= cand; ++it){
             }
             else if(strcmp(argv[x], "|") == 0){
                 int fds[2];
-                int pid;
                 char buf;
                 save = x;
                 argv[x] = '\0';
@@ -374,7 +474,7 @@ for(; it <= cand; ++it){
         
         
        else{
-        argc = -1;
+        /*argc = -1;
         token = strtok(andarr[it], tk);
         cmd = token;
         argv[++argc] = token;
@@ -384,21 +484,36 @@ for(; it <= cand; ++it){
                 token = strtok(NULL,tk);
                 argv[++argc] = token;
             }
-        argv[++argc] = '\0';
-        int pid = fork();
+        argv[++argc] = '\0';*/
+        pid = fork();
             if(pid == -1){
                 perror("fork");
             }
             else if(pid == 0){
             //child 
-                if(-1 == execvp(cmd,argv ) ){
-                    perror("execvp");
+                if( strcmp(cmd, "exit") == 0){ exit(2);}
+                else if( strcmp(cmd, "cd") == 0){
+                    exit(3);
+                }
+                else{
+                    if( -1 == execvp(cmd,argv ) )
+                        perror("execvp");
                 }
                 exit(1);
             }
             else{
-                if(wait(0) == -1){
+                int stat_loc;
+                if(waitpid(0,&stat_loc, 0) == -1){
                     perror("wait()");
+                }
+                if(stat_loc == 512) exit(1);
+                if(stat_loc == 768){    
+                    if(argv[1] != '\0'){
+                        ch_cwdir(argv[1]);
+                    }
+                    else{
+                        ch_cwdir();
+                    }
                 }
             }
        }
