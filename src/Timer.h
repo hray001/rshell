@@ -92,19 +92,3 @@ Timer::elapsedTime (double &wallclock, double &user_time, double &system_time)
         }
 }
 
-/* Exaqmple of use
- 
-#include "Timer.h"
-#include <iostream.h>
-
-int main()
-{
-    Timer t;
-    double eTime;
-    t.start();
-    for (int i=0, j; i<1000000000; i++)
-        j++;
-    t.elapsedUserTime(eTime);
-    cout << eTime << endl;
-}
-*/
