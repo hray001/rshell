@@ -18,6 +18,7 @@ using namespace std;
 static int pid = -1;
 
 void sig_int_handler(int signum){
+    cout << endl;
     if(pid == 0){
     //child
         if(kill(0, SIGKILL) == -1) perror("kill");
@@ -45,11 +46,42 @@ void ch_cwdir(){
     return;    
 }
 
+int execute_command( char **argv){
+    char *env;
+    if( (env = getenv("PATH")) == NULL) perror("getenv");
+
+    vector< char * > envarr;
+    envarr.resize(128);
+    char *arr;
+    int i = -1;
+    arr = strtok(env, ":");
+    envarr[i++] = arr;
+    while( arr != NULL){
+        arr = strtok(NULL, ":");
+        envarr.at(i) = arr;
+        i++;
+    }
+    envarr.at(i) = '\0';
+    const char *slash = "/";
+    for(int x = 0; x < i-1; ++x){
+        char command[4096];
+        strcpy(command, envarr[x]);
+        strcat(command, slash);
+        strcat(command, argv[0]);
+        envarr[x] = command;;
+        if(execv(envarr[x], argv) == -1){
+            if(errno == ENOENT) continue;
+            else perror("execv");    
+       } 
+    }
+    return -1;
+}
+
 int main(){
     signal(SIGINT, sig_int_handler);
-    char **COMMANDS;
-    COMMANDS[0] = "exit";
-    COMMANDS[1] = "cd";
+    char *COMMANDS[20];
+    COMMANDS[0] = "exit'\0'";
+    COMMANDS[1] = "cd'\0'";
 
 
 
@@ -68,7 +100,7 @@ int main(){
    
     cout << user << "@" << host << ":";
     //current working directory to be output
-    char *cwdbuf;
+    char cwdbuf[128];
     if(getcwd(cwdbuf, 128) == NULL) perror("getcwd");
     cout << cwdbuf << "$ ";
     string input;
@@ -496,8 +528,36 @@ for(; it <= cand; ++it){
                     exit(3);
                 }
                 else{
-                    if( -1 == execvp(cmd,argv ) )
-                        perror("execvp");
+                    /*char *env;
+                    if( (env = getenv("PATH")) == NULL) perror("getenv");
+                    vector<char *> envarr;
+                    envarr.resize(128);
+                    char *earr;
+                    int count = -1;
+                    earr = strtok(env, ":");
+                    envarr[++count] = earr;
+                    while(earr != NULL){
+                        earr = strtok(NULL, ":");
+                        envarr.push_back(earr);
+                        count++;
+                    }
+                    
+                    envarr[count++] = '\0';
+                    int execcheck = 0;
+                    for(int i = 0; i < count; ++i){
+                        //cout << envarr.at(i) << endl;
+                        string path = "";
+                        strcat(envarr.at(i), argv[0]);
+                        cout << path << endl;
+                        execcheck = execv(envarr.at(i) , argv);    
+                        if(errno == ENOEXEC) continue;
+                    } 
+                   
+                    if( execcheck == -1)
+                        perror("execv");
+                        */
+                
+                if(execute_command(argv) == -1) cout << "error" << endl;
                 }
                 exit(1);
             }
