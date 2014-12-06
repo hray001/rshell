@@ -82,7 +82,7 @@ int main(){
 
 
     char * user = getlogin();
-    if(user == " "){
+    if(user == (char *) " "){
         perror("getlogin() failed to attain username");
         user = (char *) "usererror";
     }
@@ -110,7 +110,6 @@ int main(){
    // if(input == "exit"){
    //     exit(1);
    // }
-    char *start = (char *) input.c_str();
     char str[4096];
     unsigned i; 
         for(i = 0; i < input.length(); i++){
@@ -559,7 +558,7 @@ for(; it <= cand; ++it){
                         perror("execv");
                         */
                 
-                if(execute_command(argv) == -1) cout << "error" << endl;
+                if(execute_command(argv) == -1){perror("exec");} 
                 }
                 }
                 exit(1);
