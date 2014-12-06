@@ -97,6 +97,7 @@ void ls_R( char *r_arg){
         }
        }
     }
+    if( errno != 0) perror("readdir");
     if(direntp == NULL) perror("readdir");
     output_sorted(v);
     if(flag_a){
@@ -180,6 +181,7 @@ int main(int argc, char** argv)
             ++bufsize;
             ++k;
         }
+        if( errno != 0) perror("readdir");
         //sprintf(buf, "%s/%s", argv[arg[i]], direntp->d_name);
         //cout << endl << endl;
         if(flag_R){
@@ -206,11 +208,7 @@ int main(int argc, char** argv)
 
             }
 */            
-            
-            
-             
         }
-
         else if(flag_l){
                 if(!flag_a && direntp->d_name[0] != '.'){
                     char *temp = direntp->d_name;
@@ -220,18 +218,19 @@ int main(int argc, char** argv)
                         perror("stat");
                         exit(1);
                     }
-                    
                     char perm[10];
-                    
                     time_t t= sb.st_mtime;
                     struct tm ts;
                     localtime_r(&t, &ts);
                     char timebuf[80];
-
+                    errno = 0;
                     struct passwd *getpwuid(uid_t uid);
+                    if(errno != 0) perror("*getpwuid");
                     char *ID = getpwuid(sb.st_uid)->pw_name;
                     if(ID == NULL) perror("getpwuid");
+                    errno = 0;
                     struct group *getgrgid(gid_t gid);
+                    if(errno != 0) perror("*getgrgid");
                     char *GID = getgrgid(sb.st_gid)->gr_name;
                     if(GID == NULL) perror("getgrgid");
 
@@ -336,6 +335,7 @@ int main(int argc, char** argv)
             buf[i] = '\0';
         }
     }
+    if(errno != 0) perror("readdir");
     if(!flag_l && !flag_R){
         output_sorted(v);
         /*sort(v.begin(), v.end(), ignore_case_less);

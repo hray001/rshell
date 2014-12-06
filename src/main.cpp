@@ -18,7 +18,6 @@ using namespace std;
 static int pid = -1;
 
 void sig_int_handler(int signum){
-    cout << endl;
     if(pid == 0){
     //child
         if(kill(0, SIGKILL) == -1) perror("kill");
@@ -36,15 +35,12 @@ void sig_int_handler(int signum){
 void ch_cwdir(char *PATH){
 
     if( chdir(PATH) == -1) perror("chdir");
-    char *newcwdbuf;
-    cout << getcwd(newcwdbuf, 128) << endl;
+    char *newcwdbuf = NULL;
+    newcwdbuf = getcwd(newcwdbuf, 128);
+    cout << newcwdbuf << endl;
     return;   
 }
 
-void ch_cwdir(){
-    cout << "Error: must specify directory to change to." << endl; 
-    return;    
-}
 
 int execute_command( char **argv){
     char *env;
@@ -53,9 +49,9 @@ int execute_command( char **argv){
     vector< char * > envarr;
     envarr.resize(128);
     char *arr;
-    int i = -1;
+    int i = 0;
     arr = strtok(env, ":");
-    envarr[i++] = arr;
+    envarr[i] = arr;
     while( arr != NULL){
         arr = strtok(NULL, ":");
         envarr.at(i) = arr;
@@ -79,16 +75,16 @@ int execute_command( char **argv){
 
 int main(){
     signal(SIGINT, sig_int_handler);
-    char *COMMANDS[20];
-    COMMANDS[0] = "exit'\0'";
+    const char *COMMANDS[20];
+    COMMANDS[0] = "exit '\0'"; 
     COMMANDS[1] = "cd'\0'";
 
 
 
-    string user = getlogin();
+    char * user = getlogin();
     if(user == " "){
         perror("getlogin() failed to attain username");
-        user = "usererror";
+        user = (char *) "usererror";
     }
     char host[1024];
     int len = 1024;
@@ -103,7 +99,7 @@ int main(){
     char cwdbuf[128];
     if(getcwd(cwdbuf, 128) == NULL) perror("getcwd");
     cout << cwdbuf << "$ ";
-    string input;
+    string input = "";
     char *argv[BUFSIZ];
     char *token, *cmd;
     char tk[] = " ";
@@ -111,12 +107,11 @@ int main(){
     
     char semicolon[] = ";";
     getline(cin, input);
-
    // if(input == "exit"){
    //     exit(1);
    // }
-
-    char *str = new char[input.size()+1];
+    char *start = (char *) input.c_str();
+    char str[4096];
     unsigned i; 
         for(i = 0; i < input.length(); i++){
             if(input[i] == '#'){
@@ -128,7 +123,7 @@ int main(){
             str[i] = input[i];
         }
     str[i] = '\0';
-    string end = "exit";
+    /*string end = "exit";
     int endcount = 0;
     for(unsigned i = 0; i < 5; i++){
         if(str[i] != end[i]){
@@ -139,12 +134,12 @@ int main(){
         }
     }
     if(endcount >= 4){
-        exit(1);
-    }
+        return 0;
+    }*/
 //-------------------------split tokens by ';'-------------------------------
     vector <char *> connectorarr; 
     connectorarr.resize(128);
-    char *arr = new char[semicount]; 
+    char *arr; 
     arr = strtok(str, semicolon);
     connectorarr[++argc] = arr;
     while(arr != NULL){
@@ -157,7 +152,7 @@ int main(){
 cout << connectorarr[j]<< " " << argc << " "<< j << endl;
 }
 */
-
+    
 
 //---------------------------------------------------------------------------
 unsigned iterations = argc; //Number of commands separated by ';'
@@ -165,7 +160,7 @@ unsigned iterations = argc; //Number of commands separated by ';'
             char andchar[] = "&|";
             vector <char *> andarr;
             andarr.resize(128);
-            char *andarr2 = new char[4096];
+            char *andarr2;
             andarr2 = strtok(connectorarr[j], andchar);
             andarr[0] = andarr2;
             unsigned cand = 0;
@@ -174,7 +169,6 @@ unsigned iterations = argc; //Number of commands separated by ';'
                 andarr2 = strtok(NULL, andchar);
                 andarr[++cand] = andarr2;
             }
-            delete andarr2;
 unsigned it = 0;
 int fd = 0;
 int save;
@@ -220,11 +214,11 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                     }
                     else{
                         if(wait(0) == -1) perror("wait");
@@ -262,11 +256,13 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                     }
                     else{
                         if(wait(0) == -1) perror("wait");
@@ -292,12 +288,13 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
                         if(dup2(fd, 1) == -1) perror("dup2");
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                             exit(1);
                     }else{
                         if(wait(0) == -1) perror("wait");
@@ -325,12 +322,13 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
                         if(dup2(fd, 1) == -1) perror("dup2");
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                             exit(1);
                     }else{
                         if(wait(0) == -1) perror("wait");
@@ -373,11 +371,12 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                             exit(0);
                     }else{
                         if(wait(0) == -1) perror("wait");
@@ -417,11 +416,12 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                             exit(0);
                     }else{
                         if(wait(0) == -1) perror("wait");
@@ -448,11 +448,12 @@ for(; it <= cand; ++it){
                                 ch_cwdir(argv[last_redir + 1]);
                             }
                             else{
-                                ch_cwdir();
+                                cout << "Please specify a directory for cd" << endl;
                             }
                         }
-                        if(execvp(argv[last_redir], argv) == -1)
-                            perror("execvp");
+                        //if(execvp(argv[last_redir], argv) == -1)
+                        if(execute_command(argv) == -1)
+                            perror("execv");
                             exit(0);
                     }else{
                         if(wait(0) == -1) perror("wait");
@@ -523,6 +524,7 @@ for(; it <= cand; ++it){
             }
             else if(pid == 0){
             //child 
+                if(cmd !=NULL){
                 if( strcmp(cmd, "exit") == 0){ exit(2);}
                 else if( strcmp(cmd, "cd") == 0){
                     exit(3);
@@ -559,7 +561,9 @@ for(; it <= cand; ++it){
                 
                 if(execute_command(argv) == -1) cout << "error" << endl;
                 }
+                }
                 exit(1);
+                
             }
             else{
                 int stat_loc;
@@ -572,7 +576,7 @@ for(; it <= cand; ++it){
                         ch_cwdir(argv[1]);
                     }
                     else{
-                        ch_cwdir();
+                        cout << "Please specify a directory for cd" << endl;
                     }
                 }
             }
