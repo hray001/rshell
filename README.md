@@ -96,3 +96,14 @@ IO Redirection
 
 `|`: all forms of piping are problematic, will not work.
 
+cd
+---
+`cd` with no specified directories will output an error instead of changing to the HOME directory
+
+PATH
+---
+After changing execvp to execv commands such as `g++` will no longer work. There is also the issue of no longer being able to successfully create more than 2 shells inside the first one. Beyond the second call to `./rshell` there will just be an execv message of 'SUCCESS'; however a new shell will not open. Looking further into this why the `execv` call succeeds yet the new shell is not opened.
+
+VALGRIND
+---
+There is one instance of a valgrind possible "memory leak" error with the use of `str::getline`. Looking online it seems this is a false positive but it still shows up in the hammer. #Note to self: Talk to Taeyoung on monday about this.
