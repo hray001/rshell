@@ -1,0 +1,60 @@
+Script started on Fri 05 Dec 2014 10:20:36 PM PST
+~
+hray001@hammer $ cd rshell/src/
+~/rshell/src
+hray001@hammer $ ./rshell 
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #showing basic PATH shown for the cwd
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cd .. #changing the cwd, basic use of cd
+/home/csmajs/hray001/rshell
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell$ cd .. .. #for more than one directory listed, the second is simply ignored
+/home/csmajs/hray001
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001$ cd #for no listed directory an error message is output
+Please specify a directory for cd
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001$ cd rshell/src #showing for a path longer than one directory
+/home/csmajs/hray001/rshell/src
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cat #showing CTRL-C inside the child
+asdf
+asdf
+^Chray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #showing CTRL-C inside the paren
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ ^C^C^C^Cecho hello #still works
+hello
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ ./rshell #showing CTRL-C inside another rshell
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ ^C^C^C^C^C^C
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ exit
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #still inside first shell
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #showing exec works for commands
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ echo hello > test
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cat test
+hello
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ echo goodbye > test
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cat test
+goodbye
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ echo moretests > test; cat test; echo lasttest > test; cat test  #just showing multiple commands still work on a single line for execv
+moretests
+lasttest
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ ls #for some reason the way the path is parsed, bin's ls is always run regardless of how ls is called
+a.out	getenvtest.cpp	gplusplus.cpp  main.cpp  signals.script  test	   Timer.h
+cp.cpp	getline.cpp	ls.cpp	       rshell	 sysCallLines	 test.cpp
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ ./ls -s #just proving that the ls I created is not being called
+total 140
+36 a.out    4 getenvtest.cpp   0 gplusplus.cpp	24 main.cpp   0 signals.script	 0 test       4 Timer.h
+ 8 cp.cpp   4 getline.cpp     16 ls.cpp		36 rshell     4 sysCallLines	 4 test.cpp
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ g++ gplusplus.cpp #people were saying g++ worked in their shells but mine returns an error for trying to exec 'cc1plus' 
+g++: error trying to exec 'as': execvp: No such file or directory
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ g++ gplusplus.cpp #Normally it gives an error for cc1plus for this, this is the first time I've seen it give a separate error
+g++: error trying to exec 'as': execvp: No such file or directory
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cat #just testing to see if this 'as' is being stored permanently somehow and interrupting subsequent calls
+test test test
+test test test
+^Chray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ cat gplusplus.cpp #simple file with nothing but int main() in it
+int main(){
+    return 0;
+    }
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #above just to show that the file would compile normally
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ #deon   one basic testing
+hray001@hammer.cs.ucr.edu:/home/csmajs/hray001/rshell/src$ exit
+~/rshell/src
+hray001@hammer $ exit
+exit
+
+Script done on Fri 05 Dec 2014 10:27:44 PM PST

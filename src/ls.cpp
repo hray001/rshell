@@ -155,9 +155,9 @@ int main(int argc, char** argv)
         }
         cout << argv[arg[i]] << ":" << endl;
     }
-    char *dirName;
+    char dirName[4096];
     string dot = ".";
-    strcpy(dirName, dot. c_str() );
+    strcpy(dirName, dot.c_str() );
     DIR *dirp;
     if ( (dirp = opendir(argv[arg[i]]))  == NULL){
         perror("opendir");
